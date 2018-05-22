@@ -48,7 +48,7 @@ if [ -z "$umi_length" ]; then umi_length=16; fi
 
 
 
-sample_name=$(echo $input_file | cut -d'.' -f 1 | cut -d'_' -f 1 ) 
+sample_name=$(echo $input_file | rev | cut -d'/' -f 1 | rev | cut -d'.' -f 1 | cut -d'_' -f 1 ) 
 
 
 echo "input file: " $input_file
