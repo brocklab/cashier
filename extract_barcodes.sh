@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 version="0.1"
-# get arguments 
 
+# get arguments 
 while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   -V | --version )
     echo $version
@@ -39,7 +39,20 @@ esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
 
 
+
+# set defaults 
+if [ -z "$upstream_sequence" ]; then upstream_sequence="CTTGTGGAAAGGACGAAACACCG"; fi 
+if [ -z "$downstream_sequence" ]; then downstream_sequence="GTTTTAGAGCTAGAA"; fi 
+if [ -z "$barcode_length" ]; then barcode_length=20; fi 
+if [ -z "$umi_length" ]; then umi_length=16; fi 
+
+
+
+sample_name=$(echo $input_file | cut -d'.' -f 1 | cut -d'_' -f 1 ) 
+
+
 echo "input file: " $input_file
+echo "sample name: " $sample_name
 echo "required barcode length: " $barcode_length
 echo "upstream sequence: " $upstream_sequence
 echo "downstream_sequence: " $downstream_sequence
@@ -49,7 +62,7 @@ echo "downstream_sequence: " $downstream_sequence
 ### barcode extraction 
 
 echo "running barcode extraction"
-barcode_fastq_file=${input_file%.fastq}.barcode.fastq
+barcode_fastq_file=$sample_name.barcode.fastq
 echo "barcode fastq file: " $barcode_fastq_file
 
 cutadapt -e 0.1 --minimum-length=$barcode_length --maximum-length=$barcode_length --max-n=0 -g $upstream_sequence -a $downstream_sequence -n 2 -o $barcode_fastq_file $input_file
@@ -62,7 +75,7 @@ if [ -n "$min_quality" ]; then
 fi 
 
 echo "transforming fastq to tsv" 
-barcode_tsv_file=${input_file%.fastq}.barcodes.tsv 
+barcode_tsv_file=$sample_name.barcodes.tsv 
 awk 'BEGIN{RS="@";OFS="\t"}NR>1{print $1,$3}'  $barcode_fastq_file > $barcode_tsv_file
 
 
@@ -72,7 +85,7 @@ awk 'BEGIN{RS="@";OFS="\t"}NR>1{print $1,$3}'  $barcode_fastq_file > $barcode_ts
 if [ -n "$extract_umi" ]; then 
 	echo "running UMI extraction"
 	echo "required UMI length: " $umi_length
-	umi_fastq_file=${input_file%.fastq}.umi.fastq 
+	umi_fastq_file=$sample_name.umi.fastq 
 	echo "umi fastq file: " $umi_fastq_file
 	if  [ -n "$trim" ]; then 
 		trim=$trim 
@@ -89,7 +102,7 @@ if [ -n "$extract_umi" ]; then
 	fi 
 
 	echo "transforming umi fastq to tsv" 
-	umi_tsv_file=${input_file%.fastq}.umi.tsv 
+	umi_tsv_file=$sample_name.umi.tsv 
 	awk 'BEGIN{RS="@";OFS="\t"}NR>1{print $1,$3}'  $umi_fastq_file > $umi_tsv_file
 
 	# joining barcode and umi on read name 
@@ -97,7 +110,7 @@ if [ -n "$extract_umi" ]; then
 	echo "joining barcode and umi on read name "
 	sort -k1 $barcode_tsv_file > ${barcode_tsv_file%.tsv}.sorted.tsv
 	sort -k1 $umi_tsv_file > ${umi_tsv_file%.tsv}.sorted.tsv 
-	join ${umi_tsv_file%.tsv}.sorted.tsv ${barcode_tsv_file%.tsv}.sorted.tsv > ${input_file%.fastq}.umi.barcode.tsv 
+	join ${umi_tsv_file%.tsv}.sorted.tsv ${barcode_tsv_file%.tsv}.sorted.tsv > $sample_name.umi.barcode.tsv 
 
 fi 
 
