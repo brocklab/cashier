@@ -38,7 +38,7 @@ echo "clustering with levenshtien distance: " $distance
 # cluster to generate starcode output, pass through awk column aggregator and sort 
 sorted_starcode_umi_file=${input_file%.tsv}.umiclustered.d${distance}.sorted.stc
 echo "printing starcode umi clustering output to: " $sorted_starcode_umi_file
-cat $input_file | cut -d' ' -f 2 | starcode -d $distance --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_umi_file
+cat $input_file | cut -d' ' -f 2 | starcode -d $distance -t 4 --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_umi_file
 echo "joining clustered umi data with original file"
 input_file_with_umi_clusters=${input_file%.tsv}.umiclustered.d${distance}.tsv
 join -t " " -1 2 -2 3 -o '1.1,0,1.3,2.1,2.2' <(sort -k 2 $input_file) $sorted_starcode_umi_file > $input_file_with_umi_clusters
@@ -46,7 +46,7 @@ join -t " " -1 2 -2 3 -o '1.1,0,1.3,2.1,2.2' <(sort -k 2 $input_file) $sorted_st
 # cluster to generate starcode output, pass through awk column aggregator and sort 
 sorted_starcode_barcode_file=${input_file%.tsv}.barcodeclustered.d${distance}.sorted.stc
 echo "printing starcode barcode clustering output to: " $sorted_starcode_barcode_file
-cat $input_file | cut -d' ' -f 3 | starcode -d $distance --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_barcode_file
+cat $input_file | cut -d' ' -f 3 | starcode -d $distance -t 4 --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_barcode_file
 echo "joining clustered barcode data with umi-appended original file"
 output_file=${input_file%.tsv}.clustered.d${distance}.tsv
 join -t " " -1 3 -2 3 -o '1.1,1.2,0,1.4,1.5,2.1,2.2' <(sort -k 3 $input_file_with_umi_clusters) $sorted_starcode_barcode_file > $output_file
