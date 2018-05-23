@@ -1,0 +1,40 @@
+notes 
+------ 
+
+231 9 replicate experimental design: 
+
+1000 sorted cells (i.e. 1000 barcode diversity)
+grown, aliquoted 50K per well, treated
+barcodes amplified off 250K genomes 
+
+
+
+
+
+----- scratch code ------ 
+
+
+
+for x in 106 107 108 109 110 111 112 113 HG3 neg
+do 
+cat $x.umi.barcode.clustered.d2.tsv | cut -d' ' -f 4,5,6,7 | sort -k 3,1 | uniq | awk -v x=$x '{print x" "$0}' >> final.umi.barcode.centroids.d2.tsv 
+done 
+
+
+
+
+for x in 106 107 108 109 110 111 112 113 HG3 neg
+for y in 3 4 5 6 7 8 
+do 
+~/aziz_scratch/crispr_barcoding_code/cluster_umi_barcode_file.sh -i $x.umi.barcode.tsv -d $y 
+cat $x.umi.barcode.clustered.d$y.tsv | cut -d' ' -f 4,5,6,7 | sort -k 3,3 -k 1,1 | uniq | awk -v x=$x '{print x" "$0}' >> final.umi.barcode.centroids.d$y.tsv 
+done 
+
+
+
+1000 sorted cells 
+50K per well, grown 
+amplified off 250K genomes 
+
+
+

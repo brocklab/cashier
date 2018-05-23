@@ -17,38 +17,49 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   -d | --distance )
     shift; distance=$1
     ;;
+  -bd | --barcode-distance )
+    shift; barcode_distance=$1
+    ;;
+  -ud | --umi-distance )
+    shift; umi_distance=$1
+    ;;
   -s | --sep )
     shift; separator=$1
     ;;
 esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
 
-if [ -z "$distance" ]; then distance=1; fi 
+
 if [ -z "$input_file" ]; then echo "must supply input file with -i "; exit; fi 
 if [ -z "$separator" ]; then separator=" "; fi 
+if [ -z "$distance" ]; then distance=1; fi 
+if [ -z "$barcode_distance" ]; then barcode_distance=$distance; fi 
+if [ -z "$umi_distance" ]; then umi_distance=$distance; fi 
 
 
 sample_name=$(echo $input_file | rev | cut -d'/' -f 1 | rev | cut -d'.' -f 1 | cut -d'_' -f 1 ) 
 
 echo "input file: " $input_file
 echo "sample name: " $sample_name
-echo "clustering with levenshtien distance: " $distance 
-
 
 # cluster to generate starcode output, pass through awk column aggregator and sort 
-sorted_starcode_umi_file=${input_file%.tsv}.umiclustered.d${distance}.sorted.stc
+echo "clustering UMIs with levenshtien distance: " $umi_distance 
+sorted_starcode_umi_file=${input_file%.tsv}.umiclustered.ud${umi_distance}.sorted.stc
 echo "printing starcode umi clustering output to: " $sorted_starcode_umi_file
-cat $input_file | cut -d' ' -f 2 | starcode -d $distance -t 4 --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_umi_file
+cat $input_file | cut -d' ' -f 2 | starcode -d $umi_distance -t 12 --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_umi_file
+
 echo "joining clustered umi data with original file"
-input_file_with_umi_clusters=${input_file%.tsv}.umiclustered.d${distance}.tsv
+input_file_with_umi_clusters=${input_file%.tsv}.umiclustered.ud${umi_distance}.tsv
 join -t " " -1 2 -2 3 -o '1.1,0,1.3,2.1,2.2' <(sort -k 2 $input_file) $sorted_starcode_umi_file > $input_file_with_umi_clusters
 
+
 # cluster to generate starcode output, pass through awk column aggregator and sort 
-sorted_starcode_barcode_file=${input_file%.tsv}.barcodeclustered.d${distance}.sorted.stc
+sorted_starcode_barcode_file=${input_file%.tsv}.barcodeclustered.d${barcode_distance}.sorted.stc
 echo "printing starcode barcode clustering output to: " $sorted_starcode_barcode_file
-cat $input_file | cut -d' ' -f 3 | starcode -d $distance -t 4 --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_barcode_file
+cat $input_file | cut -d' ' -f 3 | starcode -d $barcode_distance -t 12 --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_barcode_file
+
 echo "joining clustered barcode data with umi-appended original file"
-output_file=${input_file%.tsv}.clustered.d${distance}.tsv
+output_file=${input_file%.tsv}.clustered.ud${umi_distance}.bd${barcode_distance}.tsv
 join -t " " -1 3 -2 3 -o '1.1,1.2,0,1.4,1.5,2.1,2.2' <(sort -k 3 $input_file_with_umi_clusters) $sorted_starcode_barcode_file > $output_file
 
 head $output_file
