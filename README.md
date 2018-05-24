@@ -1,15 +1,41 @@
-# crispr_barcoding_code
+# Expressed CRISPR-compatible barcoding tools 
 
-collection of code to process crispr-compatible barcoding libraries 
+A collection of bash scripts to process crispr-compatible barcoding amplicon and scRNAseq libraries. 
 
-now supports UMI and barcode extraction 
+Now supports simultaneous UMI and barcode extraction and clustering. 
+
+Vizualization tools in development. 
+
+## Getting Started 
+
+To extract barcode sequences from amplicon data: 
+```
+extract_barcodes.sh -i 1K.raw.fastq 
+```
+To extract barcode and UMI sequences from amplicon data: 
+``` 
+extract_barcodes.sh -i 1K.raw.fastq --umi 
+``` 
+To cluster UMI and barcode sequences: 
+``` 
+cluster_umi_barcode_file.sh -i 1K.umi.barcode.tsv --distance 2 
+``` 
+
+### Dependencies 
+
+* cutadapt - to identify and mask adapter sequences 
+* fastq_quality_filter - to filter minimum base quality 
+* starcode - to cluster UMIs and barcodes on minimum levenshtein distance
 
 
-### runtime options: 
+### Runtime Options: 
+
+``` 
+extract_barcodes.sh -i <input_file> 
 
 -V show version 
 
--v verbose mode     (shows all bash executions) 
+-v verbose mode  (shows all bash executions) 
 
 -i | --input  <input fastq file> 
 
@@ -29,7 +55,7 @@ now supports UMI and barcode extraction
   
   
   
-#### defaults to the following properties: 
+defaults to the following properties: 
 
 upstream (5') adapter sequence: CTTGTGGAAAGGACGAAACACCG
 
@@ -40,22 +66,31 @@ barcode length: 20bp
 umi length: 16bp 
 
 
-
-#### example 
-
-to extract barcodes from file: 
-
-extract_barcodes.sh -i 1K.raw.fastq
-
-to extract barcodes and UMIs from file: 
-
-extract_barcodes.sh --umi -i 1K.raw.fastq 
+```
 
 
 
-#### two dependencies: 
-requires cutadapt to perform adapter recoginition and masking 
-requires fastq_quality_filter to perform quality filtering 
+
+``` 
+cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file> 
+
+
+-i | --input <input file in form readname \t umi \t barcode> 
+
+-V | --version   show version and exit 
+
+-v | --verbose   verbose mode - all bash executions will be printed
+
+-d | --distance  <int minimum levenshtein distance for clustering> 
+
+-bd | --barcode-distance  <int minimum distance for barcode clustering> 
+
+-ud | --umi-distance   <int minimum distance for umi clustering> 
+
+-s | --sep   <string separator for file (" " or "\t", generally) 
+```
+
+
 
 
 
