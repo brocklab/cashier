@@ -4,7 +4,7 @@ A collection of bash scripts to process crispr-compatible barcoding amplicon and
 
 Now supports simultaneous UMI and barcode extraction and clustering. 
 
-Vizualization tools in development. 
+Abstracted python/pandas vizualization functions in development. 
 
 ## Getting Started 
 
