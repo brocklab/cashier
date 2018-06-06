@@ -26,6 +26,9 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   -s | --sep )
     shift; separator=$1
     ;;
+  -uo | --umi-only )
+    skip_barcodes=1
+    ;;
 esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
 
@@ -52,16 +55,20 @@ echo "joining clustered umi data with original file"
 input_file_with_umi_clusters=${input_file%.tsv}.umiclustered.ud${umi_distance}.tsv
 join -t " " -1 2 -2 3 -o '1.1,0,1.3,2.1,2.2' <(sort -k 2 $input_file) $sorted_starcode_umi_file > $input_file_with_umi_clusters
 
-
-# cluster to generate starcode output, pass through awk column aggregator and sort 
-sorted_starcode_barcode_file=${input_file%.tsv}.barcodeclustered.d${barcode_distance}.sorted.stc
-echo "printing starcode barcode clustering output to: " $sorted_starcode_barcode_file
-cat $input_file | cut -d' ' -f 3 | starcode -d $barcode_distance -t 12 --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_barcode_file
-
-echo "joining clustered barcode data with umi-appended original file"
-output_file=${input_file%.tsv}.clustered.ud${umi_distance}.bd${barcode_distance}.tsv
-join -t " " -1 3 -2 3 -o '1.1,1.2,0,1.4,1.5,2.1,2.2' <(sort -k 3 $input_file_with_umi_clusters) $sorted_starcode_barcode_file > $output_file
-
-head $output_file
-echo "final clustered file saved to: " $output_file
-
+if [ -z "$skip_barcodes" ];
+then 
+  # cluster to generate starcode output, pass through awk column aggregator and sort 
+  sorted_starcode_barcode_file=${input_file%.tsv}.barcodeclustered.bd${barcode_distance}.sorted.stc
+  echo "printing starcode barcode clustering output to: " $sorted_starcode_barcode_file
+  cat $input_file | cut -d' ' -f 3 | starcode -d $barcode_distance -t 12 --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_barcode_file
+  
+  echo "joining clustered barcode data with umi-appended original file"
+  output_file=${input_file%.tsv}.clustered.ud${umi_distance}.bd${barcode_distance}.tsv
+  join -t " " -1 3 -2 3 -o '1.1,1.2,0,1.4,1.5,2.1,2.2' <(sort -k 3 $input_file_with_umi_clusters) $sorted_starcode_barcode_file > $output_file
+  
+  head $output_file
+  echo "final clustered file saved to: " $output_file; 
+else 
+  echo "not clustering barcodes" 
+  echo "final umi-clustered file saved: " $input_file_with_umi_clusters
+fi 
