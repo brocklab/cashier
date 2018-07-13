@@ -47,7 +47,8 @@ if open(samhandle, 'r').next()[0:3]!='@HD':
 	#samhandle.close()
 	sys.stderr.write('sam does not have header!\n')
 	sys.stderr.write('fixing by copying fake mammalian header\n')
-	f = tempfile.NamedTemporaryFile(delete=False)
+	sys.stderr.write('cwd: {}\n'.format(os.getcwd()))	
+	f = tempfile.NamedTemporaryFile(delete=False, dir=os.getcwd())
 	sys.stderr.write('copying new sam to {}\n'.format(f.name))
 	f.write(fake_header)
 	with open(samhandle, 'r') as samfile: 
