@@ -92,5 +92,15 @@ cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file>
 
 
 
+## Shortcut to extract lineage barcodes straight from 10X tagged SAM file: 
+
+```
+first use samtools to convert possorted.bam > possorted.sam 
+
+python sam_to_name_labeled_fastq.py 10x_possorted.sam | cutadapt -g CTTGTGGAAAGGACGAAACACCG -a  GTTTTAGAGCTAGAA  -  | python fastq_tagged_to_tsv.py - > readname_umi_cellbarcode_lineagebarcode.tsv 
+
+```
+
+
 
 
