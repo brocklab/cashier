@@ -1,12 +1,12 @@
-##  Cash in on Expressed Barcoded Tags (EBT) from NGS Sequencing Data. 
+##  Cash in on Expressed Barcode Tags (EBTs) from NGS Sequencing Data 
 
 Bash and python scripts at your fingertips. 
 
 This arsenal defaults to our particular brand of barcoding amplicon data, but it's easily relatable to your line of work. 
 
-Processes barcode sequencing data from both amplicon and scRNAseq sources, and enables working with 5' UMI adapters. Things are getting interesting. 
+Processes barcode sequencing data from both amplicon and scRNAseq sources, and enables working with 5' UMI adapters.
 
-We also use starcode, a radically fast minimum levenshtein clustering tool, to adapt for random sequencing error in the extracted barcodes. 
+We employ starcode, a radically fast minimum levenshtein clustering tool, to compensate for sequencing error in the extracted barcodes (and UMIs). 
 
 
 
@@ -106,10 +106,10 @@ cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file>
 
 
 
-## Shortcut to extract lineage barcodes straight from 10X tagged SAM file: 
+## Extract lineage barcodes straight from the impressively-accurate tagged 10X BAM output: 
 
 ```
-We can tag reads from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags. We then like to translate the resulting fastq to a tsv: 
+We tag read names from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags, outputing the fastq of adapter-detected trimmed reads to fastq, whence we translate to a tsv: 
 
 first use samtools to convert possorted.bam > possorted.sam 
 
