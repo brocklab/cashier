@@ -106,7 +106,7 @@ cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file>
 
 
 
-## Extract lineage barcodes straight from the impressively-accurate tagged 10X BAM output: 
+### Extract lineage barcodes straight from trustably tagged 10X cellranger BAM output: 
 
 ```
 We tag read names from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags, outputing the fastq of adapter-detected trimmed reads to fastq, whence we translate to a tsv: 
