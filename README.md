@@ -1,12 +1,12 @@
-##  Cashier processes Expressed Barcoded Tags (EBT) from amplicon and scRNA Data. 
+##  Cash in on Expressed Barcoded Tags (EBT) from NGS Sequencing Data. 
 
-Bash and python scripts at the ready to process barcoded sequencing data! 
+Bash and python scripts at your fingertips. 
 
-This arsenal is defaulted to process our particular brand of barcoding amplicon data, but it's easily relatable to your line of work. 
+This arsenal defaults to our particular brand of barcoding amplicon data, but it's easily relatable to your line of work. 
 
-Now processes barcode sequencing data from amplicon and scRNAseq sources. Things are getting interesting. 
+Processes barcode sequencing data from both amplicon and scRNAseq sources, and enables working with 5' UMI adapters. Things are getting interesting. 
 
-Also supports simultaneous UMI and barcode extraction, now with error correction and lineage barcode clustering thanks to the incredible people who developed starcode, a radically fast levenshtein-based clustering tool. 
+We also use starcode, a radically fast minimum levenshtein clustering tool, to adapt for random sequencing error in the extracted barcodes. 
 
 
 
@@ -29,10 +29,13 @@ To cluster UMI and barcode sequences for a particular sample:
 cluster_umi_barcode_file.sh -i sample_1.umi.barcode.tsv --distance 1 
 ``` 
 
-Right now we build quite a few intermediate files. We're working on it. <sample_name.umi.barcode.tsv> has your groceries. 
+Right now we build quite a few intermediate files, so please bear with us. You can also pipe things straight through as below. 
+
+<sample_name.umi.barcode.tsv> has your groceries. 
 
 
-### Dependencies 
+
+### Beautiful Dependencies 
 
 * cutadapt - to identify and mask adapter sequences 
 * fastq_quality_filter - to filter minimum base quality 
@@ -67,7 +70,7 @@ extract_barcodes.sh -i <input_file>
   
   
   
-defaults to the following properties for COLBERT expressed gRNA barcode libraries: 
+DEFAULTS to the following properties the ingest the mind-blowingly-useful "COLBERT", a transduced expressed gRNA barcode library developed by Aziz in the Brock Lab to trace cell lineages: 
 
 upstream (5') adapter sequence: CTTGTGGAAAGGACGAAACACCG
 
@@ -76,7 +79,6 @@ downstream (3') adapter sequence: GTTTTAGAGCTAGAA
 barcode length: 20bp 
 
 umi length: 16bp 
-
 
 ```
 
@@ -107,7 +109,7 @@ cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file>
 ## Shortcut to extract lineage barcodes straight from 10X tagged SAM file: 
 
 ```
-We can tag reads from the possorted.bam file with their 10X-corrected highly reliable whitelisted cell and umi barcodes, then check reads for some expressed barcode tag adapters, then translate the resulting fastq to a tsv: 
+We can tag reads from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags. We then like to translate the resulting fastq to a tsv: 
 
 first use samtools to convert possorted.bam > possorted.sam 
 
