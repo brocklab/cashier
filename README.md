@@ -2,11 +2,11 @@
 
 Bash and python scripts at your fingertips. 
 
-This arsenal defaults to our particular brand of barcoding amplicon data, but it's easily relatable to your line of work. 
-
 Processes barcode sequencing data from both amplicon and scRNAseq sources, and enables working with 5' UMI adapters.
 
 We employ starcode, a radically fast minimum levenshtein clustering tool, to compensate for sequencing error in the extracted barcodes (and UMIs). 
+
+This arsenal defaults to our particular brand of crispr/cpf1 library, but it's easily relatable to your line of work. 
 
 
 
