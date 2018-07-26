@@ -54,7 +54,7 @@ Right now we build quite a few intermediate files, so please bear with us. You c
 ### Runtime Options: 
 
 ``` 
-extract_barcodes.sh -i <input_file> 
+cashier_extract -i <input_file> 
 
 -V show version 
 
