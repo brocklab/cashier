@@ -1,8 +1,10 @@
 ##  Cash in on Expressed Barcode Tags (EBTs) from NGS Sequencing Data 
 
-Bash and python scripts at your fingertips. 
+Cashier is a tool to simplify extraction and error-correction of expressed barcode tags. 
 
-Processes barcode sequencing data from both amplicon and scRNAseq sources, and enables working with 5' UMI adapters.
+This repository puts bash and python scripts for barcode analysis at your fingertips, tied together with the simple tool called Cashier for one-stop shopping. 
+
+Processes barcode sequencing data from both amplicon and scRNAseq sources, and now enables working with 5' UMI adapters.
 
 We employ starcode, a radically fast minimum levenshtein clustering tool, to compensate for sequencing error in the extracted barcodes (and UMIs). 
 
@@ -10,20 +12,33 @@ This arsenal defaults to our particular brand of crispr/cpf1 library, but it's e
 
 
 
-## Getting Started 
+
+### Beautiful Dependencies 
+
+* cutadapt - to identify and mask adapter sequences 
+* fastq_quality_filter - to filter minimum base quality 
+* starcode - to cluster UMIs and barcodes using a levenshtein distance network and message passing clustering (min centroid-point clustering threshold at default 5 to 1) 
+
+
+
+## Getting Started With Amplicon Data 
 
 To extract barcode sequences from amplicon data (our crispr gRNA barcode adapters as default): 
 ```
-extract_barcodes.sh -i 1K.raw.fastq 
+cashier_extract -i 1K.raw.fastq 
 ```
 Adapted for your adapters: 
 ```
-extract_barcodes.sh -i 1K.raw.fastq -u <upstream adapter sequence> -d <downstream adapter sequence> 
+cashier_extract -i 1K.raw.fastq -u <upstream adapter sequence> -d <downstream adapter sequence> 
 ```
 To extract barcode and UMI sequences from amplicon data: 
 ``` 
-extract_barcodes.sh -i 1K.raw.fastq --umi 
+cashier_extract -i 1K.raw.fastq --umi 
 ``` 
+
+
+## Error Correction of UMI and Barcode Sequences 
+
 To cluster UMI and barcode sequences for a particular sample: 
 ``` 
 cluster_umi_barcode_file.sh -i sample_1.umi.barcode.tsv --distance 1 
@@ -33,13 +48,6 @@ Right now we build quite a few intermediate files, so please bear with us. You c
 
 <sample_name.umi.barcode.tsv> has your groceries. 
 
-
-
-### Beautiful Dependencies 
-
-* cutadapt - to identify and mask adapter sequences 
-* fastq_quality_filter - to filter minimum base quality 
-* starcode - to cluster UMIs and barcodes using a levenshtein distance network and message passing clustering (min centroid-point clustering threshold at default 5 to 1) 
 
 
 
@@ -106,10 +114,11 @@ cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file>
 
 
 
-### Extract lineage barcodes straight from trustably tagged 10X cellranger BAM output: 
+### Extract lineage barcodes straight from trustably-tagged 10X cellranger output: 
 
 ```
-We tag read names from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags, outputing the fastq of adapter-detected trimmed reads to fastq, whence we translate to a tsv: 
+We tag read names from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags, outputing a fastq of adapter-detected trimmed reads, whence we translate to a tsv: 
+
 
 first use samtools to convert possorted.bam > possorted.sam 
 

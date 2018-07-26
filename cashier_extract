@@ -39,6 +39,9 @@ esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
 
 
+# require input fastq file 
+if [ -z "$input_file" ]; then echo "Must supply an input file:   cashier_extract -i <input.fastq>"; exit; fi 
+
 
 # set defaults 
 if [ -z "$upstream_sequence" ]; then upstream_sequence="CTTGTGGAAAGGACGAAACACCG"; fi 
