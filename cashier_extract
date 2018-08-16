@@ -105,15 +105,18 @@ if [ -n "$extract_umi" ]; then
 	fi 
 
 	echo "transforming umi fastq to tsv" 
-	umi_tsv_file=$sample_name.umi.tsv 
+	umi_tsv_file=$sample_name.umis.tsv 
 	awk 'BEGIN{RS="@";OFS="\t"}NR>1{print $1,$3}'  $umi_fastq_file > $umi_tsv_file
 
 	# joining barcode and umi on read name 
 
 	echo "joining barcode and umi on read name "
-	sort -k1 $barcode_tsv_file > ${barcode_tsv_file%.tsv}.sorted.tsv
-	sort -k1 $umi_tsv_file > ${umi_tsv_file%.tsv}.sorted.tsv 
-	join ${umi_tsv_file%.tsv}.sorted.tsv ${barcode_tsv_file%.tsv}.sorted.tsv > $sample_name.umi.barcode.tsv 
+	# sort -k1 $barcode_tsv_file > ${barcode_tsv_file%.tsv}.sorted.tsv
+	# sort -k1 $umi_tsv_file > ${umi_tsv_file%.tsv}.sorted.tsv 
+	# join ${umi_tsv_file%.tsv}.sorted.tsv ${barcode_tsv_file%.tsv}.sorted.tsv > $sample_name.umi.barcode.tsv 
+
+	join <(sort -k1 $umi_tsv_file ) <(sort -k1 $barcode_tsv_file) | tr ' ' '\t' > $sample_name.umis.barcodes.tsv 
+
 
 fi 
 

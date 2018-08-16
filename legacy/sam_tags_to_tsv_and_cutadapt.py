@@ -8,7 +8,7 @@ samhandle = sys.argv[1]
 # outhandle = sys.argv[2]
 
 sys.stderr.write('finding header on sam file: {}\n'.format(samhandle))
-# print 'writing to tsv file: {}'.format(outhandle) 
+# print 'writing to txt file: {}'.format(outhandle) 
 
 # def make_df(record): return pd.DataFrame(record.tags, columns=['c', record.query_name]).set_index('c').T
 

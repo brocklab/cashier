@@ -47,12 +47,12 @@ echo "sample name: " $sample_name
 
 echo 'clustering barcodes'
 # cluster to generate starcode output, pass through awk column aggregator and sort 
-sorted_starcode_barcode_file=${input_file%.tsv}.barcodeclustered.bd${barcode_distance}.sorted.stc
+sorted_starcode_barcode_file=${input_file%.txt}.barcodeclustered.bd${barcode_distance}.sorted.stc
 echo "printing starcode barcode clustering output to: " $sorted_starcode_barcode_file
 cat $input_file | cut -d' ' -f 4 | starcode -d $barcode_distance -t $threads --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $sorted_starcode_barcode_file
 
 echo "joining clustered barcode data with input file"
-output_file=${input_file%.tsv}.clustered.bd${barcode_distance}.tsv
+output_file=${input_file%.txt}.clustered.bd${barcode_distance}.txt
 join -t " " -1 4 -2 3 -o '1.1,1.2,1.3,0,1.5,1.6,2.1,2.2' <(sort -k 4 $input_file) $sorted_starcode_barcode_file > $output_file
 
 head $output_file
