@@ -18,7 +18,7 @@ def process_record(record):
 	# sys.stderr.write('\n')
 	# print record
 	# read_name, umi, cell_barcode = record[0].rstrip('\n').split('_')
-	cell_barcode, umi, read_name = record[0].rstrip('\n').split(':')
+	cell_barcode, umi, read_name = record[0].strip('@').rstrip('\n').split(':')
 	lineage_barcode = record[1].rstrip('\n')
 	print "{}\t{}\t{}\t{}".format(read_name, umi, cell_barcode, lineage_barcode)
 
