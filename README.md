@@ -41,12 +41,12 @@ cashier_extract -i 1K.raw.fastq --umi
 
 To cluster UMI and barcode sequences for a particular sample: 
 ``` 
-cluster_umi_barcode_file.sh -i sample_1.umi.barcode.txt --distance 1 
+cluster_umi_barcode_file.sh -i sample_1.umi.barcode.tsv --distance 1 
 ``` 
 
 Right now we build quite a few intermediate files, so please bear with us. You can also pipe things straight through as below. 
 
-<sample_name.umi.barcode.txt> has your groceries. 
+<sample_name.umi.barcode.tsv> has your groceries. 
 
 
 
@@ -92,9 +92,8 @@ umi length: 16bp
 
 
 
-
 ``` 
-cluster_umi_barcode_file.sh -i <input readname-umi-barcode.txt file> 
+cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file> 
 
 
 -i | --input <input file in form readname \t umi \t barcode> 
@@ -109,20 +108,23 @@ cluster_umi_barcode_file.sh -i <input readname-umi-barcode.txt file>
 
 -ud | --umi-distance   <int minimum distance for umi clustering> 
 
--s | --sep   <string separator for file (" " or "\t", generally) 
 ```
+
+cluster_columns.sh has the same options as cluster_umi_barcode_file.sh, but you can cluster any columns of interest using the -c flag such as -c 4,5. 
+
+
 
 
 
 ### Extract lineage barcodes straight from trustably-tagged 10X cellranger output: 
 
 ```
-We tag read names from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags, outputing a fastq of adapter-detected trimmed reads, whence we translate to a txt: 
+We tag read names from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags, outputing a fastq of adapter-detected trimmed reads, whence we translate to a tsv: 
 
 
 first use samtools to convert possorted.bam > possorted.sam 
 
-python sam_to_name_labeled_fastq.py 10x_possorted.sam | cutadapt -g CTTGTGGAAAGGACGAAACACCG -a  GTTTTAGAGCTAGAA  -  | python fastq_tagged_to_txt.py - > readname_umi_cellbarcode_lineagebarcode.txt 
+python sam_to_name_labeled_fastq.py 10x_possorted.sam | cutadapt -g CTTGTGGAAAGGACGAAACACCG -a GTTTTAGAGCTAGAA  -  | python fastq_tagged_to_tsv.py - > readname_umi_cellbarcode_lineagebarcode.tsv 
 
 ```
 
