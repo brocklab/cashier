@@ -24,7 +24,8 @@ def process_record(record):
 	lineage_barcode = record[1].rstrip('\n')
 
 	cell_barcode = cell_barcode[-17:]
-	print "{}\t{}\t{}\t{}".format(read_name, umi, cell_barcode, lineage_barcode)
+	if len(lineage_barcode) >= minimum_lineage_barcode_length:
+		print "{}\t{}\t{}\t{}".format(read_name, umi, cell_barcode, lineage_barcode)
 
 
 lines = []
