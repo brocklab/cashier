@@ -12,7 +12,7 @@ else:
 	infile = open(fastqhandle, 'r')
 
 
-minimum_lineage_barcode_length=1
+minimum_lineage_barcode_length=10
 
 def process_record(record): 
 	# sys.stderr.write('working on record: \n')
