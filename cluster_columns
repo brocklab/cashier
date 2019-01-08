@@ -24,7 +24,7 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
     skip_barcodes=1
     ;;
   -t | --threads )
-    threads=$1
+    shift; threads=$1
     ;;
   -c | --columns )
 		shift; IFS=',' read -r -a columns <<< $1
@@ -54,7 +54,7 @@ do
 	echo "clustering column " $column " with levenshtien distance: " $distance 
 	tmp_sorted_starcode_file=tmp_${input_file%.tsv}.c${column}d${distance}.sorted.stc
 	echo "printing starcode clustering output to: " $tmp_sorted_starcode_file
-	cat $input_file | cut -f $column | starcode -d $distance -t $threads -r ratio --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $tmp_sorted_starcode_file
+	cat $input_file | cut -f $column | starcode -d $distance -t $threads -r $ratio --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $tmp_sorted_starcode_file
 	
 	echo "joining clustered data with original file"
 	input_file_with_clustered_data=${input_file%.tsv}.c${column}d${distance}r${ratio}.tsv
