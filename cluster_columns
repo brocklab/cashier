@@ -17,6 +17,9 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   -d | --distance )
     shift; distance=$1
     ;;
+  -r | --ratio )
+    shift; ratio=$1
+    ;;
   -uo | --umi-only )
     skip_barcodes=1
     ;;
@@ -32,6 +35,7 @@ if [[ "$1" == '--' ]]; then shift; fi
 
 if [ -z "$input_file" ]; then echo "must supply input file with -i "; exit; fi 
 if [ -z "$distance" ]; then distance=1; fi 
+if [ -z "$ratio" ]; then ratio=5; fi 
 if [ -z "$threads" ]; then threads=1; fi 
 if [ -z "$columns" ]; then columns=(2 3); echo 'columns argument not supplied, running clustering on columns ' $columns; fi 
 
@@ -50,10 +54,10 @@ do
 	echo "clustering column " $column " with levenshtien distance: " $distance 
 	tmp_sorted_starcode_file=tmp_${input_file%.tsv}.c${column}d${distance}.sorted.stc
 	echo "printing starcode clustering output to: " $tmp_sorted_starcode_file
-	cat $input_file | cut -f $column | starcode -d $distance -t $threads --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $tmp_sorted_starcode_file
+	cat $input_file | cut -f $column | starcode -d $distance -t $threads -r ratio --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $tmp_sorted_starcode_file
 	
 	echo "joining clustered data with original file"
-	input_file_with_clustered_data=${input_file%.tsv}.c${column}d${distance}.tsv
+	input_file_with_clustered_data=${input_file%.tsv}.c${column}d${distance}r${ratio}.tsv
 
 	# first_file_output_columns=join_by "," $(seq 1 `awk  -F' ' '{print NF}'  $input_file | sort -nu`)
 	# echo "first file output columns: " $first_file_output_columns
