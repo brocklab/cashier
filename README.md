@@ -1,19 +1,16 @@
 ##  Cash in on Expressed Barcode Tags (EBTs) from NGS Sequencing Data 
 
-Cashier is a tool to simplify extraction and error-correction of expressed barcode tags. 
+Cashier is a tool to simplify extraction and error-correction of expressed barcode tags from sequencing reads. 
 
-This repository puts bash and python scripts for barcode analysis at your fingertips, tied together with the simple tool called Cashier for one-stop shopping. 
+It is basically a wrapper for cutadapt an impressive program that identifies and removes flanking adapter sequences to extract the barcodes, and starcode, a radically fast minimum levenshtein clustering tool, to compensate for sequencing error in the extracted barcodes (and UMIs).  
 
-Processes barcode sequencing data from both amplicon and scRNAseq sources, and now enables working with 5' UMI adapters.
+We use it to process our barcode sequencing data from both amplicon and scRNAseq sources, and it can even work with 5' UMI adapters.
 
-We employ starcode, a radically fast minimum levenshtein clustering tool, to compensate for sequencing error in the extracted barcodes (and UMIs). 
-
-This arsenal defaults to our particular brand of crispr/cpf1 library, but it's easily relatable to your line of work. 
+This software defaults to our particular brand of crispr/cpf1 library, but it's easily relatable to your line of work. 
 
 
 
-
-### Beautiful Dependencies 
+###  Dependencies Needed In Path 
 
 * cutadapt - to identify and mask adapter sequences 
 * fastq_quality_filter - to filter minimum base quality 
@@ -51,7 +48,7 @@ Right now we build quite a few intermediate files, so please bear with us. You c
 
 
 
-### Runtime Options: 
+### casher_extract uses cutadapt to identify and trim flanking adapters: 
 
 ``` 
 cashier_extract -i <input_file> 
@@ -90,13 +87,14 @@ umi length: 16bp
 
 ```
 
-
+### cluster_columns.sh uses starcode to run levenshtein-distance clustering on a file, then join those cluster centroids with the original data 
 
 ``` 
-cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file> 
+cluster_columns.sh -i <input readname-umi-barcode.tsv file> 
 
+-i | --input <tab-separated input input file> 
 
--i | --input <input file in form readname \t umi \t barcode> 
+-c | --columns  the columns you want to cluster (can be comma-saparated list) 
 
 -V | --version   show version and exit 
 
@@ -108,24 +106,24 @@ cluster_umi_barcode_file.sh -i <input readname-umi-barcode.tsv file>
 
 -ud | --umi-distance   <int minimum distance for umi clustering> 
 
-```
-
-cluster_columns.sh has the same options as cluster_umi_barcode_file.sh, but you can cluster any columns of interest using the -c flag such as -c 4,5. 
-
-
-
-
-
-### Extract lineage barcodes straight from trustably-tagged 10X cellranger output: 
 
 ```
-We tag read names from the possorted.bam file with their 10X-corrected whitelisted cell and umi barcodes, then check reads for our expressed barcode tags, outputing a fastq of adapter-detected trimmed reads, whence we translate to a tsv: 
 
 
-first use samtools to convert possorted.bam > possorted.sam 
 
-python sam_to_name_labeled_fastq.py 10x_possorted.sam | cutadapt -g CTTGTGGAAAGGACGAAACACCG -a GTTTTAGAGCTAGAA  -  | python fastq_tagged_to_tsv.py - > readname_umi_cellbarcode_lineagebarcode.tsv 
+### Extract lineage barcodes straight from reliably-tagged 10X cellranger output: 
 
+The 10X Cellranger program uses a set of known 'whitelisted' bead barcodes for confidently mark reads with their proper bead barcode. 
+
+We keep those by annotating the read names from the cellranger output alignment file with their 10X-corrected whitelisted cell and umi barcodes (marked as tags in the sam file), then check those reads for our expressed barcode tags - outputing a final fastq of only our adapter-flanked trimmed reads that we translate to a tsv: 
+
+```
+# Translate your cellranger bam file into a sam - generally only interested in the unmapped reads 
+samtools view possorted.bam > possorted.sam
+
+# Pipe the bead- and umi-tagged reads through cutadapt to identify and trim barcodes, then translate into a tsv 
+
+python $cashier/scripts/sam_to_name_labeled_fastq.py 10x_possorted.sam | cutadapt -g CTTGTGGAAAGGACGAAACACCG -a GTTTTAGAGCTAGAA -n 2  -  | python $cashier/scripts/fastq_tagged_to_tsv.py - > readname_umi_cellbarcode_lineagebarcode.tsv 
 ```
 
 
