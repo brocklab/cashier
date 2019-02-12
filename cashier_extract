@@ -23,6 +23,9 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   -bl | --barcode_length )
     shift; barcode_length=$1
     ;;
+  -e | --error_rate )
+    shift; error_rate=$1
+    ;;
   -ul | --umi_length )
     shift; umi_length=$1
     ;;
@@ -44,10 +47,11 @@ if [ -z "$input_file" ]; then echo "Must supply an input file:   cashier_extract
 
 
 # set defaults 
-if [ -z "$upstream_sequence" ]; then upstream_sequence="CTTGTGGAAAGGACGAAACACCG"; fi 
-if [ -z "$downstream_sequence" ]; then downstream_sequence="GTTTTAGAGCTAGAA"; fi 
+if [ -z "$upstream_sequence" ]; then upstream_sequence="ATCTTGTGGAAAGGACGAAACACCG"; fi 
+if [ -z "$downstream_sequence" ]; then downstream_sequence="GTTTTAGAGCTAGAAATAGCAAGTT"; fi 
 if [ -z "$barcode_length" ]; then barcode_length=20; fi 
 if [ -z "$umi_length" ]; then umi_length=16; fi 
+if [ -z "$error_rate" ]; then error_rate=0.1; fi 
 
 
 
@@ -59,7 +63,7 @@ echo "sample name: " $sample_name
 echo "required barcode length: " $barcode_length
 echo "upstream sequence: " $upstream_sequence
 echo "downstream_sequence: " $downstream_sequence
-
+echo "allowed error rate: " $error_rate
 
 
 ### barcode extraction 
@@ -68,7 +72,7 @@ echo "running barcode extraction"
 barcode_fastq_file=$sample_name.barcode.fastq
 echo "barcode fastq file: " $barcode_fastq_file
 
-cutadapt -e 0.1 --minimum-length=$barcode_length --maximum-length=$barcode_length --max-n=0 -g $upstream_sequence -a $downstream_sequence -n 2 -o $barcode_fastq_file $input_file
+cutadapt -e $error_rate --minimum-length=$barcode_length --maximum-length=$barcode_length --max-n=0 --trimmed-only -g $upstream_sequence...$downstream_sequence -n 2 -o $barcode_fastq_file $input_file
 
 if [ -n "$min_quality" ]; then 
 	echo "filtering barcodes for all bases minimum quality " $min_quality
@@ -95,7 +99,7 @@ if [ -n "$extract_umi" ]; then
 	else
 		trim=0
 	fi 
-	cutadapt -e 0.1 --minimum-length=$umi_length --maximum-length=$umi_length --max-n=0 -a $upstream_sequence -u $trim -o $umi_fastq_file $input_file
+	cutadapt -e $error_rate --minimum-length=$umi_length --maximum-length=$umi_length --max-n=0 -a $upstream_sequence -u $trim -o $umi_fastq_file $input_file
 
 	if [ -n "$min_quality" ]; then 
 		echo "filtering UMIs for all bases minimum quality " $min_quality
