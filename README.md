@@ -106,6 +106,7 @@ cluster_columns.sh -i <input readname-umi-barcode.tsv file>
 
 -ud | --umi-distance   <int minimum distance for umi clustering> 
 
+-t | --threads  <int number of cpu threads to spawn> 
 
 ```
 
