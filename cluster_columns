@@ -53,7 +53,8 @@ do
 
 	# cluster to generate starcode output, pass through awk column aggregator and sort 
 	echo "clustering column " $column " with levenshtien distance: " $distance ", ratio of " $ratio 
-	tmp_sorted_starcode_file=tmp_${$(echo $input_file | rev | cut -d'/' -f 1 | rev )%.tsv}.c${column}d${distance}.sorted.stc
+  input_file_without_absolute_path=$(echo $input_file | rev | cut -d'/' -f 1 | rev ) 
+	tmp_sorted_starcode_file=tmp_${input_file_without_absolute_path%.tsv}.c${column}d${distance}.sorted.stc
 	echo "printing starcode clustering output to: " $tmp_sorted_starcode_file
 	cat $input_file | cut -f $column | starcode -d $distance -t $threads -r $ratio --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $tmp_sorted_starcode_file
 	
