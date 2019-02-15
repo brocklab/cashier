@@ -57,6 +57,7 @@ do
   if [ -n "$spherical" ]; then 
     method_string=" -s "
     echo "clustering column " $column " with levenshtien distance: " $distance " using spherical method" 
+    ratio='s'
   else 
     method_string=" -r $ratio "
     echo "clustering column " $column " with levenshtien distance: " $distance " using message-passing at ratio of " $ratio  
