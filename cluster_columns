@@ -21,7 +21,7 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
     shift; ratio=$1
     ;;  
   -s | --spherical )
-    method='s'
+    spherical=1
     ;;
   -uo | --umi-only )
     skip_barcodes=1
@@ -54,13 +54,13 @@ do
 	echo 'working with file ' $input_file 
   echo 'using ' $threads ' threads ' 
 
-if [ -n "$spherical" ] then 
-  method_string=" -s "
-  echo "clustering column " $column " with levenshtien distance: " $distance " using spherical method" 
-else 
-  method_string=" -r $ratio "
-  echo "clustering column " $column " with levenshtien distance: " $distance " using message-passing at ratio of " $ratio  
-fi 
+  if [ -n "$spherical" ]; then 
+    method_string=" -s "
+    echo "clustering column " $column " with levenshtien distance: " $distance " using spherical method" 
+  else 
+    method_string=" -r $ratio "
+    echo "clustering column " $column " with levenshtien distance: " $distance " using message-passing at ratio of " $ratio  
+  fi 
 
 	# cluster to generate starcode output, pass through awk column aggregator and sort 
   input_file_without_absolute_path=$(echo $input_file | rev | cut -d'/' -f 1 | rev ) 
