@@ -36,11 +36,12 @@ esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
 
 
-if [ -z "$input_file" ]; then echo "must supply input file with -i "; exit; fi 
+if [ -z "$input_file" ]; then echo "must supply input file with -i <infile> "; exit; fi 
+if [ -z "$columns" ]; then echo "must supply columns to cluster with -c <2,3,etc> "; exit; fi 
+#if [ -z "$columns" ]; then columns=(2 3); echo 'columns argument not supplied, running clustering on columns ' $columns; fi 
 if [ -z "$distance" ]; then distance=1; fi 
 if [ -z "$ratio" ]; then ratio=5; fi 
 if [ -z "$threads" ]; then threads=1; fi 
-if [ -z "$columns" ]; then columns=(2 3); echo 'columns argument not supplied, running clustering on columns ' $columns; fi 
 
 
 sample_name=$(echo $input_file | rev | cut -d'/' -f 1 | rev | cut -d'.' -f 1 | cut -d'_' -f 1 ) 
