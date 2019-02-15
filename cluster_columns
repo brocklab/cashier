@@ -60,7 +60,6 @@ do
   else 
     method_string=" -r $ratio "
     echo "clustering column " $column " with levenshtien distance: " $distance " using message-passing at ratio of " $ratio  
-
   fi 
 
 	# cluster to generate starcode output, pass through awk column aggregator and sort 
