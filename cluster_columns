@@ -19,6 +19,9 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
     ;;
   -r | --ratio )
     shift; ratio=$1
+    ;;  
+  -s | --spherical )
+    method='s'
     ;;
   -uo | --umi-only )
     skip_barcodes=1
@@ -51,12 +54,21 @@ do
 	echo 'working with file ' $input_file 
   echo 'using ' $threads ' threads ' 
 
+  if [ -n "$spherical" ] then 
+    method_string=" -s "
+    echo "clustering column " $column " with levenshtien distance: " $distance " using spherical method" 
+  else 
+    method_string=" -r $ratio "
+    echo "clustering column " $column " with levenshtien distance: " $distance " using message-passing at ratio of " $ratio  
+
+  fi 
+
 	# cluster to generate starcode output, pass through awk column aggregator and sort 
-	echo "clustering column " $column " with levenshtien distance: " $distance ", ratio of " $ratio 
   input_file_without_absolute_path=$(echo $input_file | rev | cut -d'/' -f 1 | rev ) 
 	tmp_sorted_starcode_file=tmp_${input_file_without_absolute_path%.tsv}.c${column}d${distance}r${ratio}.sorted.stc
 	echo "printing starcode clustering output to: " $tmp_sorted_starcode_file
-	cat $input_file | cut -f $column | starcode -d $distance -t $threads -r $ratio --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $tmp_sorted_starcode_file
+
+	cat $input_file | cut -f $column | starcode -d $distance -t $threads $method_string --print-clusters | awk '{split($0,arr,"\t"); split(arr[3],sequences,",");  for (i in sequences) print arr[1], arr[2], sequences[i] }' | sort -k3 | uniq > $tmp_sorted_starcode_file
 	
 	echo "joining clustered data with original file"
   output_file=$(echo $input_file | rev | cut -d'/' -f 1 | rev )  
