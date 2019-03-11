@@ -84,7 +84,7 @@ else
 	adapter_string=" -g $upstream_sequence...$downstream_sequence "
 fi 
 
-it [ -n "$threads" ]; then 
+if [ -n "$threads" ]; then 
   threads_string=" -j $threads "
 else
   threads_string=" "
