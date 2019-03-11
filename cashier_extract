@@ -38,8 +38,11 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
   -q | --min_quality )
     shift; min_quality=$1
     ;;  
-  -l | --linked_adapters )
-    linked_adapters=1
+  -ul | --unlinked_adapters )
+    unlinked_adapters=1
+    ;;  
+  -j | --threads )
+    threads=1
     ;;
 esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
@@ -75,18 +78,24 @@ echo "running barcode extraction, allowing adapter error of " $error_rate
 barcode_fastq_file=$sample_name.barcode.fastq
 echo "barcode fastq file: " $barcode_fastq_file
 
-if [ -n "$linked_adapters" ]; then 
-	adapter_string=" -g $upstream_sequence...$downstream_sequence "
-else 
+if [ -n "$unlinked_adapters" ]; then 
 	adapter_string=" -g $upstream_sequence -a $downstream_sequence "
+else 
+	adapter_string=" -g $upstream_sequence...$downstream_sequence "
 fi 
 
-cutadapt -e $error_rate --minimum-length=$barcode_length --maximum-length=$barcode_length --max-n=0 --trimmed-only $adapter_string -n 2 -o $barcode_fastq_file $input_file
+it [ -n "$threads" ]; then 
+  threads_string=" -j $threads "
+else
+  threads_string=" "
+fi 
+
+cutadapt $threads_string -e $error_rate --minimum-length=$barcode_length --maximum-length=$barcode_length --max-n=0 --trimmed-only $adapter_string -n 2 -o $barcode_fastq_file $input_file
 
 
 if [ -n "$min_quality" ]; then 
 	echo "filtering barcodes for all bases minimum quality " $min_quality
-	filtered_barcode_fastq_file=${barcode_fastq_file%.fastq}.filtered.fastq 
+	filtered_barcode_fastq_file=${barcode_fastq_file%.fastq}.q${min_quality}.fastq 
 	fastq_quality_filter -q $min_quality -p 100 -i $barcode_fastq_file -o $filtered_barcode_fastq_file -Q 33
 	barcode_fastq_file=$filtered_barcode_fastq_file
 fi 
