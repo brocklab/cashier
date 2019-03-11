@@ -42,7 +42,7 @@ while [[ "$1" =~ ^- && ! "$1" == "--" ]]; do case $1 in
     unlinked_adapters=1
     ;;  
   -j | --threads )
-    threads=1
+    shift; threads=$1
     ;;
 esac; shift; done
 if [[ "$1" == '--' ]]; then shift; fi
