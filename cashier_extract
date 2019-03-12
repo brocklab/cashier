@@ -97,11 +97,17 @@ if [ -n "$min_quality" ]; then
 	echo "filtering barcodes for all bases minimum quality " $min_quality
 	filtered_barcode_fastq_file=${barcode_fastq_file%.fastq}.q${min_quality}.fastq 
 	fastq_quality_filter -q $min_quality -p 100 -i $barcode_fastq_file -o $filtered_barcode_fastq_file -Q 33
+  rm $barcode_fastq_file
 	barcode_fastq_file=$filtered_barcode_fastq_file
 fi 
 
 echo "transforming fastq to tsv" 
-barcode_tsv_file=$sample_name.barcodes.tsv 
+if [ -n "$min_quality" ]; then 
+  barcode_tsv_file=$sample_name.barcodes.q${min_quality}.tsv 
+else 
+  barcode_tsv_file=$sample_name.barcodes.tsv 
+fi 
+
 awk 'BEGIN{RS="@";OFS="\t"}NR>1{print $1,$3}'  $barcode_fastq_file > $barcode_tsv_file
 
 
