@@ -41,7 +41,7 @@ To cluster UMI and barcode sequences for a particular sample:
 cluster_umi_barcode_file.sh -i sample_1.umi.barcode.tsv --distance 1 
 ``` 
 
-Right now we build quite a few intermediate files, so please bear with us.
+Right now we build quite a few intermediate files, so please bear with us. You can also pipe things straight through as below. 
 
 <sample_name.umi.barcode.tsv> has your groceries. 
 
@@ -79,11 +79,9 @@ cashier_extract -i <input_file>
 
 -j | --threads number of cpu cores to use (1)
 
-```
-
 
   
-DEFAULTS to the following properties sutiable for our patented tool "COLBERT", a transduced expressed gRNA barcode library developed by Aziz Al'Khafaji in the Brock Lab to trace cell lineages: 
+DEFAULTS to the following properties the ingest the mind-blowingly-useful "COLBERT", a transduced expressed gRNA barcode library developed by Aziz in the Brock Lab to trace cell lineages: 
 
 upstream (5') adapter sequence: ATCTTGTGGAAAGGACGAAACACCG
 
@@ -92,6 +90,8 @@ downstream (3') adapter sequence: GTTTTAGAGCTAGAAATAGCAAGTT
 barcode length: 20bp 
 
 umi length: 16bp 
+
+```
 
 
 ### cluster_columns.sh uses starcode to run levenshtein-distance clustering on a file, then join those cluster centroids with the original data
@@ -116,4 +116,6 @@ cluster_columns.sh -i <input readname-umi-barcode.tsv file>
 -s | --spherical  use spherical rather than message-passage clustering
 
 ```
+
+
 
