@@ -41,7 +41,7 @@ To cluster UMI and barcode sequences for a particular sample:
 cluster_umi_barcode_file.sh -i sample_1.umi.barcode.tsv --distance 1 
 ``` 
 
-Right now we build quite a few intermediate files, so please bear with us. You can also pipe things straight through as below. 
+Right now we build quite a few intermediate files, so please bear with us.
 
 <sample_name.umi.barcode.tsv> has your groceries. 
 
@@ -65,6 +65,8 @@ cashier_extract -i <input_file>
 
 -bl | --barcode_length <integer length of expected barcode (20)> 
 
+-e | --error_rate allowed error tolerance in adapters  (0.1)
+
 -q | --min_quality  <minimum PHRED quality required of all barcode bases> 
   
 -umi | --umi  perform UMI extraction as well for UMIs 5' of upstream sequence 
@@ -73,21 +75,26 @@ cashier_extract -i <input_file>
 
 -t | --trim  <integer # bases to trim on 5' end of read until UMI sequence (0)> 
   
-  
-  
-DEFAULTS to the following properties the ingest the mind-blowingly-useful "COLBERT", a transduced expressed gRNA barcode library developed by Aziz in the Brock Lab to trace cell lineages: 
+-ul | --unlinked_adapters perform adaptor sequence trimming sequentially
 
-upstream (5') adapter sequence: CTTGTGGAAAGGACGAAACACCG
+-j | --threads number of cpu cores to use (1)
 
-downstream (3') adapter sequence: GTTTTAGAGCTAGAA
+```
+
+
+  
+DEFAULTS to the following properties sutiable for our patented tool "COLBERT", a transduced expressed gRNA barcode library developed by Aziz Al'Khafaji in the Brock Lab to trace cell lineages: 
+
+upstream (5') adapter sequence: ATCTTGTGGAAAGGACGAAACACCG
+
+downstream (3') adapter sequence: GTTTTAGAGCTAGAAATAGCAAGTT
 
 barcode length: 20bp 
 
 umi length: 16bp 
 
-```
 
-### cluster_columns.sh uses starcode to run levenshtein-distance clustering on a file, then join those cluster centroids with the original data 
+### cluster_columns.sh uses starcode to run levenshtein-distance clustering on a file, then join those cluster centroids with the original data
 
 ``` 
 cluster_columns.sh -i <input readname-umi-barcode.tsv file> 
@@ -102,31 +109,11 @@ cluster_columns.sh -i <input readname-umi-barcode.tsv file>
 
 -d | --distance  <int minimum levenshtein distance for clustering> 
 
--bd | --barcode-distance  <int minimum distance for barcode clustering> 
+-uo | --umi-only skip barcodes when performing clustering
 
--ud | --umi-distance   <int minimum distance for umi clustering> 
+-t | --threads  number of cpu cores to use (1)  
 
--t | --threads  <int number of cpu threads to spawn> 
-
-```
-
-
-
-### Extract lineage barcodes straight from reliably-tagged 10X cellranger output: 
-
-The 10X Cellranger program uses a set of known 'whitelisted' bead barcodes for confidently mark reads with their proper bead barcode. 
-
-We keep those by annotating the read names from the cellranger output alignment file with their 10X-corrected whitelisted cell and umi barcodes (marked as tags in the sam file), then check those reads for our expressed barcode tags - outputing a final fastq of only our adapter-flanked trimmed reads that we translate to a tsv: 
+-s | --spherical  use spherical rather than message-passage clustering
 
 ```
-# Translate your cellranger bam file into a sam - generally only interested in the unmapped reads 
-samtools view possorted.bam > possorted.sam
-
-# Pipe the bead- and umi-tagged reads through cutadapt to identify and trim barcodes, then translate into a tsv 
-
-python $cashier/scripts/sam_to_name_labeled_fastq.py 10x_possorted.sam | cutadapt -g CTTGTGGAAAGGACGAAACACCG -a GTTTTAGAGCTAGAA -n 2  -  | python $cashier/scripts/fastq_tagged_to_tsv.py - > readname_umi_cellbarcode_lineagebarcode.tsv 
-```
-
-
-
 
