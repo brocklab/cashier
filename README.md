@@ -1,5 +1,7 @@
 ##  Cash in on Expressed Barcode Tags (EBTs) from NGS Sequencing Data 
 
+NOTE: For an updated, optimized version of cashier that is still being currently maintained, use pycashier (https://github.com/DaylinMorgan/pycashier)
+
 Cashier is a tool to simplify extraction and error-correction of expressed barcode tags from sequencing reads. 
 
 It is basically a wrapper for cutadapt an impressive program that identifies and removes flanking adapter sequences to extract the barcodes, and starcode, a radically fast minimum levenshtein clustering tool, to compensate for sequencing error in the extracted barcodes (and UMIs).  
