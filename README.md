@@ -1,6 +1,6 @@
 ##  Cash in on Expressed Barcode Tags (EBTs) from NGS Sequencing Data 
 
-NOTE: For an updated, optimized version of cashier that is still being currently maintained, use pycashier (https://github.com/DaylinMorgan/pycashier)
+NOTE: For an updated, optimized version of cashier that is still being currently maintained, use [pycashier](https://github.com/brocklab/pycashier)
 
 Cashier is a tool to simplify extraction and error-correction of expressed barcode tags from sequencing reads. 
 
